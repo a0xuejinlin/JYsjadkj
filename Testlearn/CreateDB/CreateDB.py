@@ -2,25 +2,32 @@
 import baostock as bs
 import pandas as pd
 import sqlite3
+from RetrieveData.PPSET import CJBD
+
+
 
 def createDB():
-    conn = sqlite3.connect("JYsjadkj/mystock.db")
+    conn = sqlite3.connect(CJBD)
     cursor = conn.cursor()
 
-    # create three tables, allstock stock_day_k and stock_spec
-    sql_stock = "CREATE TABLE allstock(code TEXT PRIMARY KEY, tradeStatus INT not null, code_name TEXT not null)"
-    sql_day_K = "CREATE TABLE stock_day_k(date date, code TEXT, open REAL, high REAL, low REAL, close REAL,"\
-        "preclose REAL, volume INT, amount INT, adjustflag INT, turn REAL, tradestatus INT,"\
-            "pctChg REAL, peTTM REAL, pbMRQ REAL, psTTM REAL, pcfNcfTTM REAL, isST INT, primary key (date, code))"
-    sql_stock_spec = "CREATE TABLE stock_spec(date date, code TEXT, name TEXT, relacode TEXT, alpha_y REAL, beta_y REAL, r_y REAL,"\
-        "alpha_m REAL, beta_m REAL, r_m REAL, corr_y REAL, cov_y REAL, corr_m REAL, cov_m REAL,"\
-        "amplitude_y REAL, amplitude_m REAL,amplitude_10 REAL,amplitude_5 REAL, primary key (date, code))"
-    #为stock_day_k的code列加索引
-    sql_day_K_index = "CREATE INDEX code_index ON stock_day_k (code)"
-    cursor.execute(sql_stock)
-    cursor.execute(sql_day_K)        
-    cursor.execute(sql_stock_spec)
-    cursor.execute(sql_day_K_index)
+    # create three tables
+    #创建日线指标参数（包含停牌证券）
+    sql_daystock = "CREATE TABLE DayStock(id INTEGER PRIMARY KEY AUTOINCREMENT, date TEXT, code TEXT, open REAL, high REAL, low REAL, close REAL, preclose REAL, volume INTEGER, amount REAL, adjustflag TEXT, turn REAL, tradestatus INTEGER, pctChg REAL, peTTM REAL, psTTM REAL, pcfNcfTTM REAL, pbMRQ REAL, isST INTEGER)"
+    #创建周、月线指标参数
+    sql_monthstock = "CREATE TABLE MonthStock(id INTEGER PRIMARY KEY AUTOINCREMENT, date TEXT, code TEXT, open REAL, high REAL, low REAL, close REAL, volume INTEGER, amount REAL, adjustflag TEXT, turn REAL, pctChg REAL)"
+    sql_weekstock = "CREATE TABLE weekStock(id INTEGER PRIMARY KEY AUTOINCREMENT, date TEXT, code TEXT, open REAL, high REAL, low REAL, close REAL, volume INTEGER, amount REAL, adjustflag TEXT, turn REAL, pctChg REAL)"
+    #创建5、15、30、60分钟线指标参数（不包含指数）
+    sql_minutestock5 = "CREATE TABLE MinuteStock5(id INTEGER PRIMARY KEY AUTOINCREMENT, date TEXT, time TEXT, code TEXT, open REAL, high REAL, low REAL, close REAL, volume INTEGER, amount REAL, adjustflag TEXT)"
+    sql_minutestock15 = "CREATE TABLE MinuteStock15(id INTEGER PRIMARY KEY AUTOINCREMENT, date TEXT, time TEXT, code TEXT, open REAL, high REAL, low REAL, close REAL, volume INTEGER, amount REAL, adjustflag TEXT)"
+    sql_minutestock30 = "CREATE TABLE MinuteStock30(id INTEGER PRIMARY KEY AUTOINCREMENT, date TEXT, time TEXT, code TEXT, open REAL, high REAL, low REAL, close REAL, volume INTEGER, amount REAL, adjustflag TEXT)"
+    sql_minutestock60 = "CREATE TABLE MinuteStock60(id INTEGER PRIMARY KEY AUTOINCREMENT, date TEXT, time TEXT, code TEXT, open REAL, high REAL, low REAL, close REAL, volume INTEGER, amount REAL, adjustflag TEXT)"    
+    cursor.execute(sql_daystock)
+    cursor.execute(sql_monthstock)
+    cursor.execute(sql_weekstock)    
+    cursor.execute(sql_minutestock5)  
+    cursor.execute(sql_minutestock15) 
+    cursor.execute(sql_minutestock30) 
+    cursor.execute(sql_minutestock60)   
     cursor.close()
     conn.commit()
     conn.close()
